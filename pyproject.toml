@@ -1,0 +1,23 @@
+[project]
+name = "learning-to-agent"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Derek Sheerin",email = "derek.sheerin@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "msal (>=1.32.0,<2.0.0)",
+    "openai (>=1.75.0,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+python-dotenv = "^1.1.0"
+
