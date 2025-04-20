@@ -1,0 +1,26 @@
+name: Executive Briefing Cron
+on:
+  schedule:        # 06:30 AEST = 20:30 UTC previous day
+    - cron: '30 20 * * 1-5'
+  workflow_dispatch: {}
+jobs:
+  briefing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: snok/install-poetry@v1
+        with: { python-version: '3.12' }
+      - run: poetry install --no-interaction --no-ansi
+      - name: Run agent
+        env:
+          OPENAI_API_KEY:  ${{ secrets.OPENAI_API_KEY }}
+          NEWSAPI_KEY:     ${{ secrets.NEWSAPI_KEY }}
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+          GRAPH_CLIENT_ID: ${{ secrets.GRAPH_CLIENT_ID }}
+          GRAPH_TENANT_ID: ${{ secrets.GRAPH_TENANT_ID }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          RECIPIENT: ${{ secrets.RECIPIENT }}
+        run: poetry run python -m brief_agent.agent_runner
