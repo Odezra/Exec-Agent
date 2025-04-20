@@ -21,3 +21,13 @@ build-backend = "poetry.core.masonry.api"
 pytest = "^8.3.5"
 python-dotenv = "^1.1.0"
 
+[tool.poetry]
+name = "brief-agent"
+version = "0.1.0"
+description = "Executive Daily Briefing Email Agent"
+# …
+
+[tool.poetry.packages]
+# tell Poetry to include the code under brief_agent/
+include = "brief_agent"
+
