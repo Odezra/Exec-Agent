@@ -22,6 +22,7 @@ from brief_agent.tools.news import get_headlines
 from brief_agent.tools.calendar_ms import get_meetings
 from brief_agent.tools.weather import get_weather
 from brief_agent.tools.market import get_financials
+from brief_agent.utils.emailer import send_email
 
 LOG_DIR = os.getenv("LOG_DIR", "logs")
 MODEL = "gpt-4-0613"
@@ -101,17 +102,26 @@ def run_briefing() -> None:
         {
             "role": "system",
             "content": (
-                "You are an Executive Daily Briefing agent for a technology‑consulting CEO "
-                "(Australia, UTC+10). Deliver a concise plain‑text e‑mail with these sections:\n"
-                "1. TODAY’S HEADLINES ‑ 5‑7 bullets\n"
-                "2. MEETINGS & COMMITMENTS ‑ HH:MM AEST\n"
-                "3. WEATHER ‑ MELBOURNE CBD\n"
-                "4. MARKETS OVERNIGHT\n\n"
-                "Use ONLY the provided functions; no external calls. Omit empty sections. "
-                "No HTML/markdown. ≤ 200 words."
+                "You are an Executive Daily Briefing agent for a technology‑consulting CEO in Australia (UTC+10). "
+                "Produce a concise plain-text email with these sections:\n"
+                "1. TECHNICAL HEADLINES – A table of 5 top news items on Generative AI, quantum computing, and robotics. "
+                "Include both Australian and US developments relevant to a technology consulting business in Australia. "
+                "Format as a plain-text ASCII table with columns 'Headline' and 'Link', embedding each shortened URL.\n"
+                "2. MEETINGS & COMMITMENTS – HH:MM AEST schedule.\n"
+                "3. WEATHER – Melbourne CBD forecast.\n"
+                "4. MARKETS OVERNIGHT – AUD→USD rate and NASDAQ previous close.\n\n"
+                "Omit any section with no data. Use only the provided functions; no external calls. "
+                "No HTML or markdown. Keep the entire email under 200 words."
             ),
         },
-        {"role": "user", "content": f"Generate today’s executive briefing for {today_iso}."},
+        {
+            "role": "user",
+            "content": (
+                f"Generate today’s executive briefing for {today_iso}. "
+                "In the headlines section, focus on Generative AI, quantum computing, and robotics, "
+                "covering both Australian and US developments relevant to a technology consulting business in Australia."
+            ),
+        },
     ]
 
     # ---------- main loop -----------------------------------------------------------
@@ -164,7 +174,11 @@ def run_briefing() -> None:
         messages.append({"role": "function", "name": fn_name, "content": json.dumps(payload)})
 
     logger.info("Briefing completed; email body follows:\n%s", email_body)
+    # output the briefing and send via SMTP
     print(email_body)
+    subject = f"Executive Daily Briefing for {today_iso}"
+    send_email(subject, email_body)
+    logger.info("Email sent to %s", os.getenv("RECIPIENT"))
 
 
 if __name__ == "__main__":
