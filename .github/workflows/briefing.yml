@@ -32,4 +32,5 @@ jobs:
           SMTP_USER:       ${{ secrets.SMTP_USER }}
           SMTP_PASS:       ${{ secrets.SMTP_PASS }}
           RECIPIENT:       ${{ secrets.RECIPIENT }}
+          FMP_API_KEY:     ${{ secrets.FMP_API_KEY }}
         run: poetry run python -m brief_agent.agent_runner

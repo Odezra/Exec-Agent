@@ -1,14 +1,19 @@
 from datetime import datetime as dt
-import msal
 import requests
 import os
+# MSAL may not be installed in all environments; import safely
+try:
+    import msal
+    _TOKEN_CACHE = msal.SerializableTokenCache()
+except ImportError:
+    msal = None  # type: ignore
+    _TOKEN_CACHE = None  # type: ignore
 from brief_agent.schema import Meeting
 from brief_agent.config import cfg
 
 # expected cfg() keys for confidential flow:
 # AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
 
-_TOKEN_CACHE = msal.SerializableTokenCache()
 
 def _acquire_token() -> str:
     """
@@ -58,27 +63,34 @@ def get_meetings(iso_date: str) -> list[Meeting]:
     Fetch calendar events for the given date via Microsoft Graph (UTC).
     Uses confidential‑client token if available, otherwise falls back to device flow.
     """
-    # Stub out calendar lookup in CI (e.g. GitHub Actions) to avoid auth errors
-    if os.getenv("GITHUB_ACTIONS", "").lower() == "true":
+    # Stub or safe‑fail calendar lookup to avoid breaking local/CI runs
+    try:
+        # CI stub
+        if os.getenv("GITHUB_ACTIONS", "").lower() == "true":
+            return []
+
+        # real calendar fetch via MS Graph
+        token = _acquire_token()
+        start = f"{iso_date}T00:00:00Z"
+        end = f"{iso_date}T23:59:59Z"
+        url = (
+            "https://graph.microsoft.com/v1.0/me/calendarView"
+            f"?startDateTime={start}&endDateTime={end}"
+        )
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Prefer": 'outlook.timezone="UTC"',
+        }
+        resp = requests.get(url, headers=headers)
+        resp.raise_for_status()
+        events = resp.json().get("value", [])
+        meetings: list[Meeting] = []
+        for ev in events:
+            s = dt.fromisoformat(ev["start"]["dateTime"])
+            e = dt.fromisoformat(ev["end"]["dateTime"])
+            summary = ev.get("subject") or "(no title)"
+            meetings.append(Meeting(start=s, end=e, summary=summary))
+        return meetings
+    except Exception:
+        # On any error (auth, HTTP, parsing), return empty list
         return []
-    token = _acquire_token()
-    start = f"{iso_date}T00:00:00Z"
-    end = f"{iso_date}T23:59:59Z"
-    url = (
-        "https://graph.microsoft.com/v1.0/me/calendarView"
-        f"?startDateTime={start}&endDateTime={end}"
-    )
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Prefer": 'outlook.timezone="UTC"',
-    }
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    events = resp.json().get("value", [])
-    meetings: list[Meeting] = []
-    for ev in events:
-        s = dt.fromisoformat(ev["start"]["dateTime"])
-        e = dt.fromisoformat(ev["end"]["dateTime"])
-        summary = ev.get("subject") or "(no title)"
-        meetings.append(Meeting(start=s, end=e, summary=summary))
-    return meetings

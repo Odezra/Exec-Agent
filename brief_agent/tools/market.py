@@ -5,10 +5,28 @@ def get_financials() -> tuple[float, float]:
     Fetch live AUD->USD exchange rate and NASDAQ previous close.
     Uses exchangerate.host (no API key) and Yahoo Finance.
     """
-    # Stub out financial lookup in CI (e.g. GitHub Actions) to avoid rate limits
+    # Free endpoint: Financial Modeling Prep (FMP) if API key is set
     import os
-    if os.getenv("GITHUB_ACTIONS", "").lower() == "true":
-        return 0.0, 0.0
+    key = os.getenv("FMP_API_KEY")
+    if key:
+        # AUD -> USD via FMP forex endpoint
+        fx_url = "https://financialmodelingprep.com/api/v3/forex"
+        fx_resp = requests.get(fx_url, params={"apikey": key})
+        fx_resp.raise_for_status()
+        fx_data = fx_resp.json()
+        aud_usd = next((item.get("mid", 0.0) for item in fx_data if item.get("symbol") == "AUD/USD"), 0.0)
+
+        # NASDAQ previous close via FMP quote endpoint
+        idx_url = "https://financialmodelingprep.com/api/v3/quote/%5EIXIC"
+        idx_resp = requests.get(idx_url, params={"apikey": key})
+        idx_resp.raise_for_status()
+        idx_data = idx_resp.json()
+        if isinstance(idx_data, list) and idx_data:
+            nasdaq_close = idx_data[0].get("previousClose", idx_data[0].get("price", 0.0))
+        else:
+            nasdaq_close = 0.0
+
+        return aud_usd, nasdaq_close
     # AUD -> USD via exchangerate.host
     fx_resp = requests.get(
         "https://api.exchangerate.host/latest",

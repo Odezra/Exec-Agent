@@ -17,10 +17,24 @@ def mock_requests_get(monkeypatch):
     fake_yf = {"quoteResponse": {"result": [{"regularMarketPreviousClose": 14000.0}]}}
 
     def fake_get(url, params=None):
+        # Mock exchangerate.host endpoint
         if "exchangerate.host" in url:
             return DummyResponse(fake_fx)
+        # Mock Yahoo Finance endpoint
         if "finance.yahoo.com" in url:
             return DummyResponse(fake_yf)
+        # Mock Financial Modeling Prep endpoints
+        if "financialmodelingprep.com/api/v3/forex" in url:
+            # Return list of forex pairs
+            return DummyResponse([
+                {"symbol": "AUD/USD", "mid": fake_fx["rates"]["USD"]}
+            ])
+        if "financialmodelingprep.com/api/v3/quote" in url:
+            # Return list of index quotes with previousClose
+            prev = fake_yf["quoteResponse"]["result"][0]["regularMarketPreviousClose"]
+            return DummyResponse([
+                {"previousClose": prev}
+            ])
         raise RuntimeError(f"Unexpected URL called: {url}")
 
     monkeypatch.setattr("brief_agent.tools.market.requests.get", fake_get)
