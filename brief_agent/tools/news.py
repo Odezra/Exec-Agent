@@ -6,15 +6,17 @@ from brief_agent.schema import Headline
 
 def get_headlines(iso_date: str, query: str = None, page_size: int = 7) -> list[Headline]:
     """
-    Fetch the top 3 business and technology news headlines for the given date
+    Fetch the top 5 generative AI, quantum computing, and robotics news headlines for the given date
     by scraping Google News RSS feeds. Returns a list of Headline(title, url).
     """
     # Validate date format
     _ = date.fromisoformat(iso_date)
     # RSS feed URLs for business and technology
     feeds = [
-        "https://news.google.com/rss/headlines/section/topic/BUSINESS",
-        "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY"
+        # Australia view, past 24 h
+        'https://news.google.com/rss/search?q="generative+ai"+OR+"quantum+computing"+OR+robotics+when:1d&hl=en-AU&gl=AU&ceid=AU:en',
+        # United States view, past 24 h
+        'https://news.google.com/rss/search?q="generative+ai"+OR+"quantum+computing"+OR+robotics+when:1d&hl=en-US&gl=US&ceid=US:en'
     ]
     headlines: list[Headline] = []
     # Determine how many headlines to fetch
