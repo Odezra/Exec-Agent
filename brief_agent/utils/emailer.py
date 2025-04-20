@@ -10,7 +10,12 @@ def send_email(subject: str, body: str):
     msg.set_content(body)
 
     host = os.getenv("SMTP_HOST")
-    port = int(os.getenv("SMTP_PORT", 465))
+    # Determine SMTP port: use default 465 if unset or invalid
+    port_str = os.getenv("SMTP_PORT", "").strip()
+    try:
+        port = int(port_str) if port_str else 465
+    except ValueError:
+        port = 465
     user = os.getenv("SMTP_USER")
     pwd = os.getenv("SMTP_PASS")
 
