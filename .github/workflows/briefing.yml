@@ -12,12 +12,14 @@ jobs:
         with: { python-version: '3.12' }
       - run: poetry install --no-interaction --no-ansi
       - name: Debug env
-  env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
-  run: |
-    echo "Key length = ${#OPENAI_API_KEY}"
-    if [ -z "$OPENAI_API_KEY" ]; then
-      echo "OPENAI_API_KEY is empty!" && exit 1
-    fi
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "Key length = ${#OPENAI_API_KEY}"
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY is empty!" && exit 1
+          fi
+
       - name: Run agent
         env:
           OPENAI_API_KEY:  ${{ secrets.OPENAI_API_KEY }}
@@ -25,9 +27,9 @@ jobs:
           WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
           GRAPH_CLIENT_ID: ${{ secrets.GRAPH_CLIENT_ID }}
           GRAPH_TENANT_ID: ${{ secrets.GRAPH_TENANT_ID }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          RECIPIENT: ${{ secrets.RECIPIENT }}
+          SMTP_HOST:       ${{ secrets.SMTP_HOST }}
+          SMTP_PORT:       ${{ secrets.SMTP_PORT }}
+          SMTP_USER:       ${{ secrets.SMTP_USER }}
+          SMTP_PASS:       ${{ secrets.SMTP_PASS }}
+          RECIPIENT:       ${{ secrets.RECIPIENT }}
         run: poetry run python -m brief_agent.agent_runner
