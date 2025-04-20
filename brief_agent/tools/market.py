@@ -49,25 +49,32 @@ def get_financials() -> tuple[float, float]:
         except Exception:
             # on any error (including 403), fall back to default APIs
             pass
+    # Fallback: AUD->USD via exchangerate.host and NASDAQ via Yahoo Finance
+    aud_usd: float = 0.0
+    nasdaq_close: float = 0.0
     # AUD -> USD via exchangerate.host
-    fx_resp = requests.get(
-        "https://api.exchangerate.host/latest",
-        params={"base": "AUD", "symbols": "USD"}
-    )
-    fx_resp.raise_for_status()
-    fx_data = fx_resp.json()
-    aud_usd = fx_data.get("rates", {}).get("USD", 0.0)
+    try:
+        fx_resp = requests.get(
+            "https://api.exchangerate.host/latest",
+            params={"base": "AUD", "symbols": "USD"}
+        )
+        fx_resp.raise_for_status()
+        fx_data = fx_resp.json()
+        aud_usd = fx_data.get("rates", {}).get("USD", 0.0)
+    except Exception:
+        pass
 
     # NASDAQ previous close via Yahoo Finance
-    yf_resp = requests.get(
-        "https://query1.finance.yahoo.com/v7/finance/quote",
-        params={"symbols": "^IXIC"}
-    )
-    yf_resp.raise_for_status()
-    quote = yf_resp.json().get("quoteResponse", {}).get("result", [])
-    if quote and "regularMarketPreviousClose" in quote[0]:
-        nasdaq_close = quote[0]["regularMarketPreviousClose"]
-    else:
-        nasdaq_close = 0.0
+    try:
+        yf_resp = requests.get(
+            "https://query1.finance.yahoo.com/v7/finance/quote",
+            params={"symbols": "^IXIC"}
+        )
+        yf_resp.raise_for_status()
+        quote = yf_resp.json().get("quoteResponse", {}).get("result", [])
+        if quote and isinstance(quote[0], dict) and "regularMarketPreviousClose" in quote[0]:
+            nasdaq_close = quote[0]["regularMarketPreviousClose"]
+    except Exception:
+        pass
 
     return aud_usd, nasdaq_close
