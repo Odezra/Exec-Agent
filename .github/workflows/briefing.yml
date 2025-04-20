@@ -11,6 +11,13 @@ jobs:
       - uses: snok/install-poetry@v1
         with: { python-version: '3.12' }
       - run: poetry install --no-interaction --no-ansi
+      - name: Debug env
+  env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
+  run: |
+    echo "Key length = ${#OPENAI_API_KEY}"
+    if [ -z "$OPENAI_API_KEY" ]; then
+      echo "OPENAI_API_KEY is empty!" && exit 1
+    fi
       - name: Run agent
         env:
           OPENAI_API_KEY:  ${{ secrets.OPENAI_API_KEY }}
