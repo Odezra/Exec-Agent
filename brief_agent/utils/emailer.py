@@ -7,7 +7,8 @@ def send_email(subject: str, body: str):
     msg["Subject"] = subject
     msg["From"] = os.getenv("SMTP_USER")
     msg["To"] = os.getenv("RECIPIENT")
-    msg.set_content(body)
+    # Send HTML content as the email body
+    msg.set_content(body, subtype="html")
 
     host = os.getenv("SMTP_HOST")
     # Determine SMTP port: use default 465 if unset or invalid
