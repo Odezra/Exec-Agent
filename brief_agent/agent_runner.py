@@ -14,6 +14,8 @@ import datetime
 import json
 import logging
 import os
+from dotenv import load_dotenv
+load_dotenv()
 from openai import OpenAI
 
 from brief_agent.tools.news import get_headlines
