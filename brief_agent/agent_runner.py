@@ -167,4 +167,3 @@ def run_briefing() -> None:
 
 if __name__ == "__main__":
     run_briefing()
-```
