@@ -5,6 +5,10 @@ def get_financials() -> tuple[float, float]:
     Fetch live AUD->USD exchange rate and NASDAQ previous close.
     Uses exchangerate.host (no API key) and Yahoo Finance.
     """
+    # Stub out financial lookup in CI (e.g. GitHub Actions) to avoid rate limits
+    import os
+    if os.getenv("GITHUB_ACTIONS", "").lower() == "true":
+        return 0.0, 0.0
     # AUD -> USD via exchangerate.host
     fx_resp = requests.get(
         "https://api.exchangerate.host/latest",
