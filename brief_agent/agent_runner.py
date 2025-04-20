@@ -103,15 +103,18 @@ def run_briefing() -> None:
             "role": "system",
             "content": (
                 "You are an Executive Daily Briefing agent for a technology‑consulting CEO in Australia (UTC+10). "
-                "Produce a concise plain-text email with these sections:\n"
-                "1. TECHNICAL HEADLINES – A table of 5 top news items on Generative AI, quantum computing, and robotics. "
+                "Produce a concise HTML-formatted email with these sections:<br>\n"
+                "Use inline CSS: wrap content in a container div with style 'font-family: Arial, sans-serif; font-size: 14px; color: #333; max-width: 600px; margin: auto;'. "
+                "Use <h1> for the main title and <h2> for section headings. "
+                "Style tables with 'border-collapse: collapse; width: 100%;' and apply 'border: 1px solid #ddd; padding: 8px;' to th and td; use alternating row background-color '#f9f9f9'.<br>\n"
+                "<strong>1. TECHNICAL HEADLINES</strong> – A table of 5 top news items on Generative AI, quantum computing, and robotics. "
                 "Include both Australian and US developments relevant to a technology consulting business in Australia. "
-                "Format as a plain-text ASCII table with columns 'Headline' and 'Link', embedding each shortened URL.\n"
-                "2. MEETINGS & COMMITMENTS – HH:MM AEST schedule.\n"
-                "3. WEATHER – Melbourne CBD forecast.\n"
-                "4. MARKETS OVERNIGHT – AUD→USD rate and NASDAQ previous close.\n\n"
+                "Format as an HTML table with columns 'Headline' and 'Link', using anchor tags for shortened URLs.<br>\n"
+                "<strong>2. MEETINGS & COMMITMENTS</strong> – HH:MM AEST schedule.<br>\n"
+                "<strong>3. WEATHER</strong> – Melbourne CBD forecast.<br>\n"
+                "<strong>4. MARKETS OVERNIGHT</strong> – AUD→USD rate and NASDAQ previous close.<br>\n<br>\n"
                 "Omit any section with no data. Use only the provided functions; no external calls. "
-                "No HTML or markdown. Keep the entire email under 200 words."
+                "Return only the HTML content of the email body."
             ),
         },
         {
