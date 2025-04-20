@@ -25,8 +25,8 @@ jobs:
           OPENAI_API_KEY:  ${{ secrets.OPENAI_API_KEY }}
           NEWSAPI_KEY:     ${{ secrets.NEWSAPI_KEY }}
           WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
-          GRAPH_CLIENT_ID: ${{ secrets.GRAPH_CLIENT_ID }}
-          GRAPH_TENANT_ID: ${{ secrets.GRAPH_TENANT_ID }}
+          AZURE_CLIENT_ID:   ${{ secrets.GRAPH_CLIENT_ID }}
+          AZURE_TENANT_ID:   ${{ secrets.GRAPH_TENANT_ID }}
           SMTP_HOST:       ${{ secrets.SMTP_HOST }}
           SMTP_PORT:       ${{ secrets.SMTP_PORT }}
           SMTP_USER:       ${{ secrets.SMTP_USER }}
